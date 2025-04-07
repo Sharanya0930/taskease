@@ -21,7 +21,16 @@ const User = {
       console.error("Database Error:", err);
       throw err;
     }
-  }
+  },
+  updatePassword: async (email, newPassword) => {
+    try{
+      const [result] = await db.query("UPDATE users SET password = ? WHERE email = ?", [newPassword, email]);
+      return result;
+    }
+    catch (err) {
+      console.error("Database Error:", err);
+      throw err;
+    }
+  }  
 };
-
 module.exports = User;
