@@ -43,6 +43,31 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.changePassword = async (req, res) => {
+  const { email, currentPassword, newPassword } = req.body;
+
+  try {
+    const user = await User.findByEmail(email);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const match = await bcrypt.compare(currentPassword, user.password);
+    if (!match) {
+      return res.status(400).json({ message: "Current password is incorrect" });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    await User.updatePassword(email, hashedNewPassword);
+
+    res.json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Change Password Error:", error);
+    res.status(500).json({ message: "Error changing password" });
+  }
+};
+
+
 exports.dashboard = (req, res) => {
   res.json({ message: "Protected route, Hello I'm Dashboard!" });
 };
